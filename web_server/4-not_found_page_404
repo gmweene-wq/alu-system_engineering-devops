@@ -5,7 +5,7 @@ sudo apt-get update -y
 sudo apt-get install -y nginx
 
 echo "Holberton School" | sudo tee /var/www/html/index.html
-echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
+echo -n "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
 
 new_config="server {
     listen 80 default_server;
