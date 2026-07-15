@@ -1,46 +1,9 @@
 #!/usr/bin/env bash
-# Configures Nginx with a custom X-Served-By header
-# containing the server's hostname
+# Shell script to install nginx and add X-Served-By header
 
-sudo apt-get update -y
-sudo apt-get install -y nginx
-
-echo "Hello World!" | sudo tee /var/www/html/index.html
-echo -n "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
-
-server_config="server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    root /var/www/html;
-    index index.html index.htm;
-    server_name _;
-
-    add_header X-Served-By \$hostname always;
-
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-
-    location /redirect_me {
-        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
-    }
-
-    error_page 404 /404.html;
-    location = /404.html {
-        root /var/www/html;
-        internal;
-    }
-}"
-
-echo "$server_config" | sudo tee /etc/nginx/sites-available/default
-
-sudo systemctl enable nginx
+sudo apt-get update
+sudo apt-get -y install nginx
+sudo service nginx start
+sudo sed -i "/http {/a\    add_header X-Served-By \$HOSTNAME;" /etc/nginx/nginx.conf
+echo "Hello World!" | sudo tee /usr/share/nginx/html/index.html
 sudo service nginx restart
-
-echo ""
-echo "=== VERIFICATION ==="
-echo "Hostname: $(hostname)"
-echo "X-Served-By line in nginx config:"
-sudo grep -i "X-Served-By" /etc/nginx/sites-available/default
-echo "Curl test:"
-curl -sI localhost | grep -i x-served-by
