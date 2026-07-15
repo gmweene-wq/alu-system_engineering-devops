@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Configures a brand new Ubuntu machine with nginx and a custom
-# X-Served-By header showing the server's hostname
+# Configures Nginx with a custom X-Served-By header
+# containing the server's hostname
 
 sudo apt-get update -y
 sudo apt-get install -y nginx
@@ -12,10 +12,10 @@ server_config="server {
     listen 80 default_server;
     listen [::]:80 default_server;
     root /var/www/html;
-    index index.html index.htm index.nginx-debian.html;
+    index index.html index.htm;
     server_name _;
 
-    add_header X-Served-By \$hostname;
+    add_header X-Served-By \$hostname always;
 
     location / {
         try_files \$uri \$uri/ =404;
@@ -33,4 +33,14 @@ server_config="server {
 }"
 
 echo "$server_config" | sudo tee /etc/nginx/sites-available/default
+
+sudo systemctl enable nginx
 sudo service nginx restart
+
+echo ""
+echo "=== VERIFICATION ==="
+echo "Hostname: $(hostname)"
+echo "X-Served-By line in nginx config:"
+sudo grep -i "X-Served-By" /etc/nginx/sites-available/default
+echo "Curl test:"
+curl -sI localhost | grep -i x-served-by
