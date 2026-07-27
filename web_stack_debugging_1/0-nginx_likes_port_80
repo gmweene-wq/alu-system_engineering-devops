@@ -2,5 +2,4 @@
 # Installs nginx and configures it to listen on port 80 of all active IPv4 IPs
 apt-get update
 apt-get install -y nginx
-service nginx start
-echo "Hello World!" > /var/www/html/index.nginx-debian.html
+service nginx start || /usr/sbin/nginx
