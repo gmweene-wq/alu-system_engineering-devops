@@ -3,4 +3,4 @@
 apt-get update
 apt-get install -y nginx
 service nginx start
-curl 0:80
+echo "Hello World!" > /var/www/html/index.nginx-debian.html
