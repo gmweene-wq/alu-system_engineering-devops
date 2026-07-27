@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# this is my comment
+# Installs nginx and configures it to listen on port 80 of all active IPv4 IPs
 apt-get update
 apt-get install -y nginx
-service nginx restart
+service nginx start
+curl 0:80
