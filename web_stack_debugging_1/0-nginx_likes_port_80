@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Installs nginx and configures it to listen on port 80 of all active IPv4 IPs
-apt-get update
+# Ensure nginx is installed, the default site is properly enabled, and nginx is running
+apt-get update -y
 apt-get install -y nginx
-service nginx start || /usr/sbin/nginx
+rm -f /etc/nginx/sites-enabled/default
+ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+service nginx restart
