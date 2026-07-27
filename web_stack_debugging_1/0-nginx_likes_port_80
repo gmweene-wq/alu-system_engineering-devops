@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# this is my comment
 apt-get update
 apt-get install -y nginx
 service nginx restart
