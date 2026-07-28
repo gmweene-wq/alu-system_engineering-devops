@@ -1,7 +1,28 @@
 #!/usr/bin/env bash
-# Configures nginx to run as the nginx user and listen on port 8080
-useradd nginx
-sed -i 's/user www-data;/user nginx;/' /etc/nginx/nginx.conf
-sed -i 's/listen 80 default_server;/listen 8080 default_server;/' /etc/nginx/sites-enabled/default
-sed -i 's/listen \[::\]:80 default_server;/listen [::]:8080 default_server;/' /etc/nginx/sites-enabled/default
-service nginx restart || /usr/sbin/nginx
+# Install nginx, create the nginx user, and configure nginx to run
+# entirely as that user, listening on port 8080
+
+apt-get update -y
+apt-get install -y nginx
+
+id -u nginx > /dev/null 2>&1 || useradd -r nginx
+
+sed -i 's/^user www-data;/user nginx;/' /etc/nginx/nginx.conf
+sed -i 's/listen 80 default_server;/listen 8080 default_server;/' /etc/nginx/sites-available/default
+sed -i 's/listen \[::\]:80 default_server ipv6only=on;/listen [::]:8080 default_server ipv6only=on;/' /etc/nginx/sites-available/default
+
+mkdir -p /var/lib/nginx/body
+chown -R nginx:nginx /var/log/nginx
+chown -R nginx:nginx /var/lib/nginx
+
+sed -i 's|pid /run/nginx.pid;|pid /var/lib/nginx/nginx.pid;|' /etc/nginx/nginx.conf
+
+service nginx stop > /dev/null 2>&1
+pkill nginx > /dev/null 2>&1
+sleep 1
+
+su -s /bin/bash nginx -c "/usr/sbin/nginx"
+
+sleep 1
+# shellcheck disable=SC2009
+ps auxff | grep nginx
